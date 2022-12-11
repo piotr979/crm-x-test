@@ -9,6 +9,8 @@ use Illuminate\Config\Repository as Config;
 use App\Modules\Importer\Http\Requests\ImporterRequest;
 use Illuminate\Http\Response;
 use App;
+use App\Modules\Importer\Services\HTMLService;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ImporterController
@@ -147,5 +149,15 @@ class ImporterController extends Controller
     public function import()
     {
         return view('import');
+    }
+    public function process(HTMLService $htmlService)
+    {
+        $data = '';
+       
+         if (Storage::disk('local')->exists('work_orders.html')) { 
+            $data = Storage::disk('local')->get('work_orders.html');
+         } 
+         $customerData = $htmlService->extractData($data);
+        return view('process');
     }
 }

@@ -6,7 +6,7 @@ class StartController extends Controller
 {
     public function getApp()
     {
-        return view('start');
+        return view('import');
     }
     
     public function getAppOld()
