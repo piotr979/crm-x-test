@@ -1,0 +1,7 @@
+#! /bin/sh
+#
+# Created by configure
+
+'./configure' \
+'--with-zlib-dir=/opt/homebrew/Cellar/zlib/1.2.13' \
+"$@"
