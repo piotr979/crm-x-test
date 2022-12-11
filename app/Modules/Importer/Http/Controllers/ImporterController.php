@@ -9,8 +9,10 @@ use Illuminate\Config\Repository as Config;
 use App\Modules\Importer\Http\Requests\ImporterRequest;
 use Illuminate\Http\Response;
 use App;
-use App\Modules\Importer\Services\HTMLService;
 use Illuminate\Support\Facades\Storage;
+
+use App\Modules\Importer\Services\HTMLService;
+use App\Modules\Importer\Services\ParserService;
 
 /**
  * Class ImporterController
@@ -150,14 +152,17 @@ class ImporterController extends Controller
     {
         return view('import');
     }
-    public function process(HTMLService $htmlService)
+    public function process(HTMLService $htmlService, ParserService $parserService)
     {
         $data = '';
        
          if (Storage::disk('local')->exists('work_orders.html')) { 
             $data = Storage::disk('local')->get('work_orders.html');
          } 
-         $customerData = $htmlService->extractData($data);
+         list($rawData,$tickets) = $htmlService->extractData($data);
+         $parserService->parseRawDataAndTickets($rawData, $tickets);
+      
+
         return view('process');
     }
 }

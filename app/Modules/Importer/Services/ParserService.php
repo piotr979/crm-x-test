@@ -4,19 +4,14 @@ namespace App\Modules\Importer\Services;
 
 use App\Modules\Importer\Repositories\ImporterRepository;
 use Illuminate\Container\Container;
-use DomDocument;
 
-class HTMLService
+class ParserService
 {
     /**
      * @var Container
      */
     protected $app;
 
-    /**
-     * @var $dom
-     */
-    protected $dom;
     /**
      * @var ImporterRepository
      */
@@ -32,23 +27,25 @@ class HTMLService
     {
         $this->app = $app;
         $this->importer = $importer;
-        $this->dom = new DomDocument;
     }
-    public function parseRawData(array $rawData)
+    public function parseRawDataAndTickets(array $rawData, array $tickets)
     {
-        
-    }
-    public function extractData($html)
-    {
-        // silencing DOMDocument errors
-        // due to poor html source quality
-        @$this->dom->loadHTML($html);
-        
-        $htmlDataPart1 = $this->getElementsByClassName('rgRow', 'tr');
-        $htmlDataPart2 = $this->getElementsByClassName('rgAltRow', 'tr');
-        $rawData = array_merge($htmlDataPart1, $htmlDataPart2);
-        return $rawData;
-    }
-   
+       // basically raw data contains two arrays
+       // first part are extracted values
+       // second one are anchors with ticket numbers
 
+       // 1. first part will be filtered with regex
+       // 2. second with regex too but different pattern
+
+      
+        $nodeValues = [];
+        $entityId = [];
+        foreach($rawData as $node) {
+            if (is_object($node)) {
+            $nodeValues[] = $node->nodeValue;
+            }
+        }
+        var_dump($nodeValues);
+    }
 }
+

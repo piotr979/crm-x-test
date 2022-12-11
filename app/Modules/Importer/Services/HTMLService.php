@@ -40,30 +40,64 @@ class HTMLService
         // due to poor html source quality
         @$this->dom->loadHTML($html);
         
-        $htmlDataPart1 = $this->getElementsByClassName('rgRow', 'tr');
-        $htmlDataPart2 = $this->getElementsByClassName('rgAltRow', 'tr');
-        $rawData = array_merge($htmlDataPart1, $htmlDataPart2);
-        return $rawData;
+        $matched1 = $this->getElementsByClassName('rgRow', 'tr');
+        $matched2 = $this->getElementsByClassName('rgAltRow', 'tr');
+
+        $entityId = [];
+       
+        $tickets = $this->getTickets($html);
+        foreach($tickets as $key => $value) {
+            if (stripos($value, 'Ticket.aspx?entityid=') !== false) {
+                $entityId[$key] = trim($value, 'Ticket.aspx?entityid=');
+            }
+        }
+        return [array_merge($matched1, $matched2),
+                    $entityId];
+               
+
+   }
+
+    public function getElementByName($tag, $value)
+    {
+      //  return $this->dom->getNamedItem('title');
+        
     }
     /**
      * Sourced from:
      * https://stackoverflow.com/a/52462848
      */
-    private function getElementsByClassName($ClassName, $tagName=null) {
+    private function getElementsByClassName($className, $tagName=null) {
         if($tagName){
             $Elements = $this->dom->getElementsByTagName($tagName);
         }else {
             $Elements = $this->dom->getElementsByTagName("*");
         }
-        $Matched = array();
+        $matched = array();
         for($i=0;$i<$Elements->length;$i++) {
             if($Elements->item($i)->attributes->getNamedItem('class')){
-                if($Elements->item($i)->attributes->getNamedItem('class')->nodeValue == $ClassName) {
-                    $Matched[]=$Elements->item($i);
-                }
+                if($Elements->item($i)->attributes->getNamedItem('class')->nodeValue == $className) {
+                    $matched[]=$Elements->item($i);
+                } 
+            }
+            if($Elements->item($i)->attributes->getNamedItem('title')){
+                var_dump($Elements->item($i));
             }
         }
-        return $Matched;
+       
+        return $matched;
     }
-
+    public function getTickets($html) 
+    {
+        // tickets are extractions from href attr
+        // combined with the rest of results will be
+        // returned for parsing.
+        $tickets = [];
+        foreach($this->dom->getElementsByTagName("a") as $element) {
+            if ($element->getAttribute('href')) {
+                $tickets[($element->textContent)] =
+                $element->getAttribute('href') ;
+            }
+        }
+        return $tickets;
+    }
 }
